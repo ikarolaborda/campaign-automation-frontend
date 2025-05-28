@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useTranslations, useLocale } from 'next-intl';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import Button from '@/components/ui/Button';
@@ -21,6 +22,8 @@ interface DashboardStats {
 }
 
 export default function Dashboard() {
+  const t = useTranslations('dashboard');
+  const locale = useLocale();
   const { campaigns, loading, getCampaignStats } = useCampaigns();
   const [stats, setStats] = useState<DashboardStats>({
     totalCampaigns: 0,
@@ -77,28 +80,28 @@ export default function Dashboard() {
 
   const statCards = [
     {
-      name: 'Total Campaigns',
+      name: t('stats.totalCampaigns'),
       value: stats.totalCampaigns?.toString() || '0',
       icon: MegaphoneIcon,
       color: 'text-blue-600',
       bgColor: 'bg-blue-100',
     },
     {
-      name: 'Active Campaigns',
+      name: t('stats.activeCampaigns'),
       value: stats.activeCampaigns?.toString() || '0',
       icon: ChartBarIcon,
       color: 'text-green-600',
       bgColor: 'bg-green-100',
     },
     {
-      name: 'Total Reach',
+      name: t('stats.totalReach'),
       value: (stats.totalReach || 0).toLocaleString(),
       icon: UsersIcon,
       color: 'text-purple-600',
       bgColor: 'bg-purple-100',
     },
     {
-      name: 'Avg Delivery Rate',
+      name: t('stats.avgDeliveryRate'),
       value: `${(stats.averageDeliveryRate || 0).toFixed(1)}%`,
       icon: ChartBarIcon,
       color: 'text-orange-600',
@@ -108,23 +111,23 @@ export default function Dashboard() {
 
   const quickActions = [
     {
-      name: 'Upload Users',
-      description: 'Import user data from CSV or JSON files',
-      href: '/upload',
+      name: t('actions.uploadUsers.title'),
+      description: t('actions.uploadUsers.description'),
+      href: `/${locale}/upload`,
       icon: CloudArrowUpIcon,
       color: 'bg-blue-600 hover:bg-blue-700',
     },
     {
-      name: 'Create Campaign',
-      description: 'Set up a new marketing campaign',
-      href: '/campaigns/create',
+      name: t('actions.createCampaign.title'),
+      description: t('actions.createCampaign.description'),
+      href: `/${locale}/campaigns/create`,
       icon: PlusIcon,
       color: 'bg-green-600 hover:bg-green-700',
     },
     {
-      name: 'View Campaigns',
-      description: 'Manage and monitor existing campaigns',
-      href: '/campaigns',
+      name: t('actions.viewCampaigns.title'),
+      description: t('actions.viewCampaigns.description'),
+      href: `/${locale}/campaigns`,
       icon: MegaphoneIcon,
       color: 'bg-purple-600 hover:bg-purple-700',
     },
@@ -134,15 +137,15 @@ export default function Dashboard() {
     <div className="space-y-8">
       {/* Welcome Section */}
       <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg shadow-lg p-8 text-white">
-        <h1 className="text-3xl font-bold mb-2">Welcome to Campaign Hub</h1>
+        <h1 className="text-3xl font-bold mb-2">{t('title')}</h1>
         <p className="text-indigo-100 text-lg">
-          Manage your marketing campaigns and reach your target audience effectively.
+          {t('subtitle')}
         </p>
       </div>
 
       {/* Statistics Cards */}
       <div>
-        <h2 className="text-lg font-medium text-gray-900 mb-4">Overview</h2>
+        <h2 className="text-lg font-medium text-gray-900 mb-4">{t('overview')}</h2>
         {loading || loadingStats ? (
           <div className="flex justify-center py-8">
             <LoadingSpinner size="lg" />
@@ -181,7 +184,7 @@ export default function Dashboard() {
 
       {/* Quick Actions */}
       <div>
-        <h2 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h2>
+        <h2 className="text-lg font-medium text-gray-900 mb-4">{t('quickActions')}</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {quickActions.map((action) => (
             <Link
@@ -220,10 +223,10 @@ export default function Dashboard() {
       {campaigns && campaigns.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-medium text-gray-900">Recent Campaigns</h2>
-            <Link href="/campaigns">
+            <h2 className="text-lg font-medium text-gray-900">{t('recentCampaigns')}</h2>
+            <Link href={`/${locale}/campaigns`}>
               <Button variant="outline" size="sm">
-                View All
+                {t('viewAll')}
               </Button>
             </Link>
           </div>
@@ -252,7 +255,7 @@ export default function Dashboard() {
                             : 'bg-gray-100 text-gray-800'
                         }`}
                       >
-                        {campaign.isActive ? 'Active' : 'Inactive'}
+                        {campaign.isActive ? t('active') : t('inactive')}
                       </span>
                     </div>
                   </div>

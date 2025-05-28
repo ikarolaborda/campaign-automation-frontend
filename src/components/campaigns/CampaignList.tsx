@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { Campaign, CampaignStats } from '@/types';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -24,6 +25,8 @@ interface CampaignListProps {
 }
 
 export default function CampaignList({ onRefresh }: CampaignListProps) {
+  const t = useTranslations('campaigns');
+  const tCommon = useTranslations('common');
   const { campaigns, loading, deleteCampaign, updateCampaign, getCampaignStats } = useCampaigns();
   const [campaignStats, setCampaignStats] = useState<Record<string, CampaignStats>>({});
   const [loadingStats, setLoadingStats] = useState<Record<string, boolean>>({});
@@ -50,7 +53,7 @@ export default function CampaignList({ onRefresh }: CampaignListProps) {
   }, [campaigns, campaignStats, loadingStats, getCampaignStats]);
 
   const handleDelete = async (id: string, name: string) => {
-    if (window.confirm(`Are you sure you want to delete "${name}"?`)) {
+    if (window.confirm(t('deleteConfirm', { name }))) {
       try {
         await deleteCampaign(id);
         onRefresh?.();
@@ -114,8 +117,8 @@ export default function CampaignList({ onRefresh }: CampaignListProps) {
     return (
       <div className="text-center py-12">
         <UsersIcon className="mx-auto h-12 w-12 text-gray-400" />
-        <h3 className="mt-2 text-sm font-medium text-gray-900">No campaigns</h3>
-        <p className="mt-1 text-sm text-gray-500">Get started by creating a new campaign.</p>
+        <h3 className="mt-2 text-sm font-medium text-gray-900">{t('noCampaigns')}</h3>
+        <p className="mt-1 text-sm text-gray-500">{t('noCampaignsDescription')}</p>
       </div>
     );
   }
@@ -125,14 +128,14 @@ export default function CampaignList({ onRefresh }: CampaignListProps) {
       <div className="space-y-6">
         {/* Campaign Actions Header */}
         <div className="flex justify-between items-center">
-          <h2 className="text-lg font-medium text-gray-900">All Campaigns</h2>
+          <h2 className="text-lg font-medium text-gray-900">{t('title')}</h2>
           <div className="flex space-x-2">
             <Button
               variant="outline"
               size="sm"
               onClick={() => onRefresh?.()}
             >
-              Refresh
+              {tCommon('refresh')}
             </Button>
           </div>
         </div>
@@ -161,7 +164,7 @@ export default function CampaignList({ onRefresh }: CampaignListProps) {
                         <XCircleIcon className="h-4 w-4 text-gray-400 mr-1 flex-shrink-0" />
                       )}
                       <span className={`text-sm ${campaign.isActive ? 'text-green-600' : 'text-gray-500'}`}>
-                        {campaign.isActive ? 'Active' : 'Inactive'}
+                        {campaign.isActive ? t('active') : t('inactive')}
                       </span>
                     </div>
                   </div>
@@ -173,7 +176,7 @@ export default function CampaignList({ onRefresh }: CampaignListProps) {
                       loading={isUpdating}
                       disabled={isUpdating}
                       className="!p-2"
-                      title={campaign.isActive ? 'Pause Campaign' : 'Activate Campaign'}
+                      title={campaign.isActive ? t('pauseCampaign') : t('activateCampaign')}
                     >
                       {campaign.isActive ? (
                         <PauseIcon className="h-4 w-4" />
@@ -186,7 +189,7 @@ export default function CampaignList({ onRefresh }: CampaignListProps) {
                       size="sm"
                       onClick={() => handleDelete(campaign.id, campaign.name)}
                       className="!p-2"
-                      title="Delete Campaign"
+                      title={t('deleteCampaign')}
                     >
                       <TrashIcon className="h-4 w-4" />
                     </Button>
@@ -195,11 +198,11 @@ export default function CampaignList({ onRefresh }: CampaignListProps) {
 
                 {/* Target Audience */}
                 <div className="mb-4">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">Target Audience</h4>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">{t('targetAudience')}</h4>
                   <div className="space-y-2">
                     <div className="flex items-center text-sm text-gray-600">
                       <UsersIcon className="h-4 w-4 mr-2 flex-shrink-0" />
-                      <span>Age: {campaign.targetAudience?.ageRange?.min || 0}-{campaign.targetAudience?.ageRange?.max || 0}</span>
+                      <span>{t('age')}: {campaign.targetAudience?.ageRange?.min || 0}-{campaign.targetAudience?.ageRange?.max || 0}</span>
                     </div>
                     <div className="flex flex-wrap gap-1">
                       {(campaign.targetAudience?.countries || []).map((country) => (
@@ -216,7 +219,7 @@ export default function CampaignList({ onRefresh }: CampaignListProps) {
 
                 {/* Statistics */}
                 <div className="mb-4">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">Audience Statistics</h4>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">{t('audienceStatistics')}</h4>
                   {isLoadingStats ? (
                     <div className="flex justify-center py-2">
                       <LoadingSpinner size="sm" />
@@ -224,34 +227,34 @@ export default function CampaignList({ onRefresh }: CampaignListProps) {
                   ) : stats ? (
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <p className="text-gray-500">Matching Users</p>
+                        <p className="text-gray-500">{t('matchingUsers')}</p>
                         <p className="font-medium text-gray-900">{(stats.totalMatchingUsers || 0).toLocaleString()}</p>
                       </div>
                       <div>
-                        <p className="text-gray-500">Messages Sent</p>
+                        <p className="text-gray-500">{t('messagesSent')}</p>
                         <p className="font-medium text-gray-900">{(stats.messagesSent || 0).toLocaleString()}</p>
                       </div>
                       <div>
-                        <p className="text-gray-500">Delivered</p>
+                        <p className="text-gray-500">{t('delivered')}</p>
                         <p className="font-medium text-gray-900">{(stats.messagesDelivered || 0).toLocaleString()}</p>
                       </div>
                       <div>
-                        <p className="text-gray-500">Opened</p>
+                        <p className="text-gray-500">{t('opened')}</p>
                         <p className="font-medium text-gray-900">{(stats.messagesOpened || 0).toLocaleString()}</p>
                       </div>
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-500">Unable to load statistics</p>
+                    <p className="text-sm text-gray-500">{t('unableToLoadStats')}</p>
                   )}
                 </div>
 
                 {/* Message Preview */}
                 <div className="mb-4">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">Message Template</h4>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">{t('messageTemplate')}</h4>
                   <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded break-words">
                     {(campaign.messageTemplate || '').length > 100
                       ? `${(campaign.messageTemplate || '').substring(0, 100)}...`
-                      : (campaign.messageTemplate || 'No message template')
+                      : (campaign.messageTemplate || t('noMessageTemplate'))
                     }
                   </div>
                 </div>
@@ -268,7 +271,7 @@ export default function CampaignList({ onRefresh }: CampaignListProps) {
                     onClick={() => handleViewDetails(campaign)}
                   >
                     <EyeIcon className="h-4 w-4 mr-1" />
-                    View Details
+                    {t('viewDetails')}
                   </Button>
                 </div>
               </div>
@@ -282,7 +285,7 @@ export default function CampaignList({ onRefresh }: CampaignListProps) {
         <Modal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
-          title="Campaign Details"
+          title={t('campaignDetails')}
           size="xl"
         >
           <CampaignDetails 
