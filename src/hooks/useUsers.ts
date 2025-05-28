@@ -21,7 +21,7 @@ export const useUsers = () => {
         },
       });
 
-      toast.success(`Successfully uploaded ${response.data.usersCreated} users!`);
+      toast.success(`Successfully uploaded ${response.data.count} users!`);
       return response.data;
     } catch (err: unknown) {
       const errorMessage = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Failed to upload users';

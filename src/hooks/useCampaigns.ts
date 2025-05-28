@@ -41,6 +41,26 @@ export const useCampaigns = () => {
     }
   }, []);
 
+  const updateCampaign = useCallback(async (id: string, campaignData: Partial<Campaign>) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await apiClient.put<Campaign>(`/campaigns/${id}`, campaignData);
+      setCampaigns(prev => prev.map(campaign => 
+        campaign.id === id ? response.data : campaign
+      ));
+      toast.success('Campaign updated successfully!');
+      return response.data;
+    } catch (err: unknown) {
+      const errorMessage = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Failed to update campaign';
+      setError(errorMessage);
+      toast.error(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const deleteCampaign = useCallback(async (id: string) => {
     setLoading(true);
     setError(null);
@@ -79,6 +99,7 @@ export const useCampaigns = () => {
     error,
     fetchCampaigns,
     createCampaign,
+    updateCampaign,
     deleteCampaign,
     getCampaignStats,
   };

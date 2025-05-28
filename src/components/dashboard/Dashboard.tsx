@@ -17,7 +17,7 @@ interface DashboardStats {
   totalCampaigns: number;
   activeCampaigns: number;
   totalReach: number;
-  averageMatchRate: number;
+  averageDeliveryRate: number;
 }
 
 export default function Dashboard() {
@@ -26,7 +26,7 @@ export default function Dashboard() {
     totalCampaigns: 0,
     activeCampaigns: 0,
     totalReach: 0,
-    averageMatchRate: 0,
+    averageDeliveryRate: 0,
   });
   const [loadingStats, setLoadingStats] = useState(false);
 
@@ -37,22 +37,25 @@ export default function Dashboard() {
           totalCampaigns: 0,
           activeCampaigns: 0,
           totalReach: 0,
-          averageMatchRate: 0,
+          averageDeliveryRate: 0,
         });
         return;
       }
 
       setLoadingStats(true);
       let totalReach = 0;
-      let totalMatchRate = 0;
+      let totalDeliveryRate = 0;
       let campaignsWithStats = 0;
 
       for (const campaign of campaigns) {
         try {
           const campaignStats = await getCampaignStats(campaign.id);
           if (campaignStats) {
-            totalReach += campaignStats.estimatedReach || 0;
-            totalMatchRate += campaignStats.matchPercentage || 0;
+            totalReach += campaignStats.totalMatchingUsers || 0;
+            const deliveryRate = campaignStats.messagesSent > 0 
+              ? ((campaignStats.messagesDelivered || 0) / campaignStats.messagesSent) * 100 
+              : 0;
+            totalDeliveryRate += deliveryRate;
             campaignsWithStats++;
           }
         } catch (error) {
@@ -64,7 +67,7 @@ export default function Dashboard() {
         totalCampaigns: campaigns.length,
         activeCampaigns: campaigns.filter(c => c.isActive).length,
         totalReach,
-        averageMatchRate: campaignsWithStats > 0 ? totalMatchRate / campaignsWithStats : 0,
+        averageDeliveryRate: campaignsWithStats > 0 ? totalDeliveryRate / campaignsWithStats : 0,
       });
       setLoadingStats(false);
     };
@@ -95,8 +98,8 @@ export default function Dashboard() {
       bgColor: 'bg-purple-100',
     },
     {
-      name: 'Avg Match Rate',
-      value: `${(stats.averageMatchRate || 0).toFixed(1)}%`,
+      name: 'Avg Delivery Rate',
+      value: `${(stats.averageDeliveryRate || 0).toFixed(1)}%`,
       icon: ChartBarIcon,
       color: 'text-orange-600',
       bgColor: 'bg-orange-100',

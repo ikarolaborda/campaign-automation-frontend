@@ -203,3 +203,7 @@ The application is fully responsive and includes:
 ---
 
 For more information about the backend API, see the main project README.
+
+## Disclaimer
+
+I am backend developer who can handle frontend development, but I am not a designer. The design is functional but may not be visually appealing, some components may be flaky, and there may be bugs. Full Stack development with 100/100 is nothing but a scam!

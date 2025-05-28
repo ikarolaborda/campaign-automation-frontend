@@ -28,11 +28,11 @@ export interface CreateCampaignDto {
 
 export interface CampaignStats {
   campaignId: string;
-  totalUsers: number;
-  matchedUsers: number;
-  matchPercentage: number;
+  campaignName: string;
+  totalMatchingUsers: number;
   messagesSent: number;
-  estimatedReach: number;
+  messagesDelivered: number;
+  messagesOpened: number;
 }
 
 export interface User {
@@ -45,10 +45,8 @@ export interface User {
 }
 
 export interface UploadResponse {
+  count: number;
   message: string;
-  usersProcessed: number;
-  usersCreated: number;
-  errors?: string[];
 }
 
 export interface ApiError {
